@@ -2,14 +2,12 @@
 
 
 
-## kube-crd
-
-kube-crd demonstrates the CRD usage, it shoes how to:
+bgp-crd demonstrates the CRD usage, it shoes how to:
 
 1. Connect to the Kubernetes cluster 
 2. Create the new CRD if it doesn't exist  
 3. Create a new custom client 
-4. Create a new Example object using the client library we created 
+4. Create a new BGPAsNumber object using the client library we created 
 5. Create a controller that listens to events associated with new resources
 
 The example CRD is in the following structure:
