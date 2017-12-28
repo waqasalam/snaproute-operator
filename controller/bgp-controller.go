@@ -56,7 +56,8 @@ func main() {
 	// Create a CRD client interface
 	crdclient := client.CrdClient(crdcs, scheme, "default")
 
-	// Create a new BGPAsNumber object and write to k8s
+	// Create a new BGPAsNumber object and write to k8s you can use
+	// bgp.yaml
 	bgpasnumber := &crd.BGPAsNumber{
 		ObjectMeta: meta_v1.ObjectMeta{
 			Name:   "bgpasnumber1",

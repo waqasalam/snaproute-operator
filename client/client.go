@@ -24,6 +24,7 @@ type crdclient struct {
 	codec  runtime.ParameterCodec
 }
 
+// implement
 func (f *crdclient) Create(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	var result crd.BGPAsNumber
 	err := f.cl.Post().
@@ -64,6 +65,7 @@ func (f *crdclient) List(opts meta_v1.ListOptions) (*crd.BGPAsNumberList, error)
 	return &result, err
 }
 
+// implement
 func (f *crdclient) NewListWatch() *cache.ListWatch {
 	return cache.NewListWatchFromClient(f.cl, f.plural, f.ns, fields.Everything())
 }
