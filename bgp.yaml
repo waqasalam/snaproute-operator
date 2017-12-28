@@ -1,0 +1,7 @@
+apiVersion: "snaproute.com/v1"
+kind: "BGPAsNumber"
+metadata:
+        name: bgpasxample2
+spec:
+    asnumber: "100"
+    enable: true
