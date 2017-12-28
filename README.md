@@ -1,16 +1,24 @@
 # SnapRoute Custom Resources (CRD) Tutorial
 
+## Build/Installtion
+'''
+  make container 
+  kubectl run bgp --image=bgp-crd:latest --image-pull-policy=Never
+'''
+###  Controller will startup and do following
+'''
+  Connect to the Kubernetes cluster 
+  Create the new CRD if it doesn't exist  
+  Create a new custom client 
+  Create a new BGPAsNumber object using the client library we created 
+  Create a controller that listens to events associated with new CRD
+'''
+###  Create BGPAsNumber object using yaml.
+'''
+ kubectl create -f bgp.yaml
+'''
 
-
-bgp-crd demonstrates the CRD usage, it shoes how to:
-
-1. Connect to the Kubernetes cluster 
-2. Create the new CRD if it doesn't exist  
-3. Create a new custom client 
-4. Create a new BGPAsNumber object using the client library we created 
-5. Create a controller that listens to events associated with new resources
-
-The example CRD is in the following structure:
+The BGPAsNumber CRD is in the following structure:
 
 
 ```go
