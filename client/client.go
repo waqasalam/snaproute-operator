@@ -25,6 +25,7 @@ type crdclient struct {
 }
 
 // implement
+// Create takes the representation of BGPAsNumber and creates it.  Returns the server's representation of the podDisruptionBudget, and an error, if there is any.
 func (f *crdclient) Create(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	var result crd.BGPAsNumber
 	err := f.cl.Post().
@@ -33,6 +34,7 @@ func (f *crdclient) Create(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	return &result, err
 }
 
+// Update takes the representation of BGPAsNumber and updates it. Returns the server's representation of the podDisruptionBudget, and an error, if there is any.
 func (f *crdclient) Update(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	var result crd.BGPAsNumber
 	err := f.cl.Put().
@@ -41,6 +43,23 @@ func (f *crdclient) Update(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	return &result, err
 }
 
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+/*
+func (f *crdclient) UpdateStatus(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
+	var result crd.BGPAsNumber
+	err = f.cl.Put().
+		Namespace(f.ns).
+		Resource(f.plural).
+		Name(obj.Name).
+		SubResource("status").
+		Body(obj).
+		Do().
+		Into(&result)
+	return
+}
+*/
+// Delete takes name of the BGPAsNumber and deletes it. Returns an error if one occurs.
 func (f *crdclient) Delete(name string, options *meta_v1.DeleteOptions) error {
 	return f.cl.Delete().
 		Namespace(f.ns).Resource(f.plural).
