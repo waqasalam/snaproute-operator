@@ -1,8 +1,7 @@
 package crd
 
 import (
-	"reflect"
-
+	"fmt"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -10,7 +9,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
+	"reflect"
+	"time"
 )
 
 const (
@@ -22,6 +24,7 @@ const (
 
 // Create the CRD resource, ignore error if it already exists
 func CreateCRD(clientset apiextcs.Interface) error {
+	fmt.Println("I'm creating the CRD")
 	crd := &apiextv1beta1.CustomResourceDefinition{
 		ObjectMeta: meta_v1.ObjectMeta{Name: FullCRDName},
 		Spec: apiextv1beta1.CustomResourceDefinitionSpec{
@@ -37,11 +40,40 @@ func CreateCRD(clientset apiextcs.Interface) error {
 
 	_, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Create(crd)
 	if err != nil && apierrors.IsAlreadyExists(err) {
+		fmt.Println("CRD already exists")
 		return nil
 	}
-	return err
 
+	// Wait for the CRD to be created before we use it
+	err = wait.Poll(500*time.Millisecond, 60*time.Second, func() (bool, error) {
+		crd, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(FullCRDName, meta_v1.GetOptions{})
+		if err != nil {
+			fmt.Println("panic in wait")
+			panic(err.Error())
+		}
+
+		fmt.Println("crd in wait", crd)
+		for _, cond := range crd.Status.Conditions {
+			switch cond.Type {
+			case apiextv1beta1.Established:
+				if cond.Status == apiextv1beta1.ConditionTrue {
+					fmt.Printf("success already created no wait: %v\n", cond.Status)
+
+					return true, err
+				}
+			case apiextv1beta1.NamesAccepted:
+				if cond.Status == apiextv1beta1.ConditionFalse {
+					fmt.Printf("Name conflict: %v\n", cond.Reason)
+					fmt.Printf("error", err)
+				}
+			}
+		}
+		panic(err.Error())
+	})
+	return err
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Definition of our CRD BGPAsNumber class
 type BGPAsNumber struct {
@@ -60,6 +92,9 @@ type BGPAsNumberStatus struct {
 	Message string `json:"message,omitempty"`
 }
 
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// k8s List Type
 type BGPAsNumberList struct {
 	meta_v1.TypeMeta `json:",inline"`
 	meta_v1.ListMeta `json:"metadata"`
