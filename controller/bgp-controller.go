@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bgp-crd/client"
-	"bgp-crd/crd"
 	"flag"
 	"fmt"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -11,6 +9,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
+	"snaproute-operator/client"
+	"snaproute-operator/crd"
 )
 
 // return rest config, if path not specified assume in cluster config
