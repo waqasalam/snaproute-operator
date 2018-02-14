@@ -52,8 +52,7 @@ func main() {
 	// Create a CRD client interface
 	crdclient := client.CrdClient(crdcs, scheme, "default", crd.Crds["bgproute"].CrdPlural)
 
-	// Create a new BGPAsNumber object and write to k8s you can use
-	// bgp.yaml
+	// Create a new BGPRoute object and write k8s
 	createfn := func() *crd.BGPRoute {
 		return &crd.BGPRoute{
 			ObjectMeta: meta_v1.ObjectMeta{
