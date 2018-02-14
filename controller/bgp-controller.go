@@ -38,7 +38,7 @@ func main() {
 	}
 
 	// note: if the CRD exist our CreateCRD function is set to exit without an error
-	err = crd.CreateCRD(clientset)
+	err = crd.CreateCRD(clientset, "bgpasnumber")
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +65,7 @@ func main() {
 		},
 		Status: crd.BGPAsNumberStatus{
 			State:   "created",
-			Message: "Created, not processed yet",
+			Message: "Created, not -- processed yet",
 		},
 	}
 
@@ -83,8 +83,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("List:\n%s\n", items)
-
+	fmt.Printf("Do list operations :List:\n%s\n", items)
+	fmt.Println("List operation done")
 	// BGP Controller
 	// Watch for changes in BGP objects and fire Add, Delete, Update callbacks
 
@@ -96,9 +96,17 @@ func main() {
 	)
 	controller.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			fmt.Printf("add crd shared: %s \n", obj)
+			fmt.Printf("add -- crd shared: %s \n", obj)
 			ex := obj.(*crd.BGPAsNumber)
 			fmt.Println("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
+			newex := ex.DeepCopy()
+			newex.Status.Message = "Processed in handler"
+			newex.Status.State = "Created"
+			fmt.Printf("newex %+v\n", newex)
+			newex.Spec.AsNumber = "555"
+			if _, e := crdclient.Update(newex); e != nil {
+				fmt.Println("update satus error", e)
+			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			fmt.Printf("delete: %s shared \n", obj)
@@ -106,9 +114,17 @@ func main() {
 			fmt.Printf("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 		},
 		UpdateFunc: func(oldObj, newObj interface{}) {
-			fmt.Printf("Update old: %s \n      New: %s\n", oldObj, newObj)
+			fmt.Printf("Update -- old: %s \n      New: %s\n", oldObj, newObj)
 			ex := newObj.(*crd.BGPAsNumber)
 			fmt.Printf("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
+			newex := ex.DeepCopy()
+			newex.Status.Message = "Processed in handler"
+			newex.Status.State = "Created"
+			newex.Spec.AsNumber = "555"
+			fmt.Printf("newex %+v\n", newex)
+			if _, e := crdclient.Update(newex); e != nil {
+				fmt.Println("update satus error", e)
+			}
 		},
 	},
 	)

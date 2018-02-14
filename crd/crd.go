@@ -15,6 +15,15 @@ import (
 	"time"
 )
 
+var Crds = map[string]struct {
+	CrdFullName string
+	CrdPlural   string
+	CrdKind     string
+}{
+	"bgpasnumber": {"bgpasnumbers" + "." + CRDGroup, "bgapasnumbers", reflect.TypeOf(BGPAsNumber{}).Name()},
+	"bgproute":    {"bgproutes" + "." + CRDGroup, "bgproutes", reflect.TypeOf(BGPRoute{}).Name()},
+}
+
 const (
 	CRDPlural   string = "bgpasnumbers"
 	CRDGroup    string = "snaproute.com"
@@ -23,17 +32,17 @@ const (
 )
 
 // Create the CRD resource, ignore error if it already exists
-func CreateCRD(clientset apiextcs.Interface) error {
-	fmt.Println("I'm creating the CRD")
+func CreateCRD(clientset apiextcs.Interface, crdname string) error {
+	fmt.Println("I'm creating the CRD", Crds[crdname])
 	crd := &apiextv1beta1.CustomResourceDefinition{
-		ObjectMeta: meta_v1.ObjectMeta{Name: FullCRDName},
+		ObjectMeta: meta_v1.ObjectMeta{Name: Crds[crdname].CrdFullName},
 		Spec: apiextv1beta1.CustomResourceDefinitionSpec{
 			Group:   CRDGroup,
 			Version: CRDVersion,
 			Scope:   apiextv1beta1.NamespaceScoped,
 			Names: apiextv1beta1.CustomResourceDefinitionNames{
-				Plural: CRDPlural,
-				Kind:   reflect.TypeOf(BGPAsNumber{}).Name(),
+				Plural: Crds[crdname].CrdPlural,
+				Kind:   Crds[crdname].CrdKind,
 			},
 		},
 	}
@@ -101,6 +110,35 @@ type BGPAsNumberList struct {
 	Items            []BGPAsNumber `json:"items"`
 }
 
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// Definition of our CRD BGPRoute class
+type BGPRoute struct {
+	meta_v1.TypeMeta   `json:",inline"`
+	meta_v1.ObjectMeta `json:"metadata"`
+	Spec               BGPRouteSpec   `json:"spec"`
+	Status             BGPRouteStatus `json:"status,omitempty"`
+}
+type BGPRouteSpec struct {
+	Prefix  string `json:"prefix"`
+	Length  uint32 `json:"length"`
+	Counter uint32 `json:"counter"`
+}
+
+type BGPRouteStatus struct {
+	State   string `json:"state,omitempty"`
+	Message string `json:"message,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// k8s List Type
+type BGPRouteList struct {
+	meta_v1.TypeMeta `json:",inline"`
+	meta_v1.ListMeta `json:"metadata"`
+	Items            []BGPRoute `json:"items"`
+}
+
 // Create a  Rest client with the new CRD Schema
 var SchemeGroupVersion = schema.GroupVersion{Group: CRDGroup, Version: CRDVersion}
 
@@ -108,6 +146,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&BGPAsNumber{},
 		&BGPAsNumberList{},
+		&BGPRoute{},
+		&BGPRouteList{},
 	)
 	meta_v1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

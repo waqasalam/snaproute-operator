@@ -39,16 +39,16 @@ func (f *crdclient) Update(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	var result crd.BGPAsNumber
 	err := f.cl.Put().
 		Namespace(f.ns).Resource(f.plural).
-		Body(obj).Do().Into(&result)
+		Name(obj.Name).Body(obj).Do().Into(&result)
 	return &result, err
 }
 
-// UpdateStatus was generated because the type contains a Status member.
+//UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-/*
+
 func (f *crdclient) UpdateStatus(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error) {
 	var result crd.BGPAsNumber
-	err = f.cl.Put().
+	err := f.cl.Put().
 		Namespace(f.ns).
 		Resource(f.plural).
 		Name(obj.Name).
@@ -56,9 +56,9 @@ func (f *crdclient) UpdateStatus(obj *crd.BGPAsNumber) (*crd.BGPAsNumber, error)
 		Body(obj).
 		Do().
 		Into(&result)
-	return
+	return &result, err
 }
-*/
+
 // Delete takes name of the BGPAsNumber and deletes it. Returns an error if one occurs.
 func (f *crdclient) Delete(name string, options *meta_v1.DeleteOptions) error {
 	return f.cl.Delete().
@@ -67,11 +67,11 @@ func (f *crdclient) Delete(name string, options *meta_v1.DeleteOptions) error {
 		Error()
 }
 
-func (f *crdclient) Get(name string) (*crd.BGPAsNumber, error) {
+func (f *crdclient) Get(name string, options meta_v1.GetOptions) (*crd.BGPAsNumber, error) {
 	var result crd.BGPAsNumber
 	err := f.cl.Get().
 		Namespace(f.ns).Resource(f.plural).
-		Name(name).Do().Into(&result)
+		Name(name).VersionedParams(&options, f.codec).Do().Into(&result)
 	return &result, err
 }
 
