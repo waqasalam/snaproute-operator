@@ -9,8 +9,11 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
-	"snaproute-operator/client"
-	"snaproute-operator/crd"
+	"snaproute-operator/pkg/apis/bgp/v1"
+	clientset "snaproute-operator/pkg/client/clientset/versioned"
+	scheme "snaproute-operator/pkg/client/clientset/versioned/scheme"
+	informers "snaproute-operator/pkg/client/informers/externalversions"
+	"time"
 )
 
 // return rest config, if path not specified assume in cluster config
@@ -32,44 +35,43 @@ func main() {
 	}
 
 	// create clientset and create our CRD, this only need to run once
-	clientset, err := apiextcs.NewForConfig(config)
+	clientset, err := clientset.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
 
+	// create clientset and create our CRD, this only need to run once
+	clt, err := apiextcs.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
 	// note: if the CRD exist our CreateCRD function is set to exit without an error
-	err = crd.CreateCRD(clientset, "bgpasnumber")
+	err = v1.CreateCRD(clt)
 	if err != nil {
 		panic(err)
 	}
 
-	// Create a new clientset which include our CRD schema
-	crdcs, scheme, err := crd.NewClient(config)
-	if err != nil {
-		panic(err)
-	}
-
-	// Create a CRD client interface
-	crdclient := client.CrdClient(crdcs, scheme, "default")
-
+	scheme.AddToScheme(scheme.Scheme)
+	bgpInformerFactory := informers.NewSharedInformerFactory(clientset, time.Second*30)
+	informer := bgpInformerFactory.Bgp().V1().BGPAsNumbers()
 	// Create a new BGPAsNumber object and write to k8s you can use
 	// bgp.yaml
-	bgpasnumber := &crd.BGPAsNumber{
+	bgpasnumber := &v1.BGPAsNumber{
 		ObjectMeta: meta_v1.ObjectMeta{
 			Name:   "bgpasnumber1",
 			Labels: map[string]string{"mylabel": "test"},
 		},
-		Spec: crd.BGPAsNumberSpec{
+		Spec: v1.BGPAsNumberSpec{
 			AsNumber: "one",
 			Enable:   true,
 		},
-		Status: crd.BGPAsNumberStatus{
+		Status: v1.BGPAsNumberStatus{
 			State:   "created",
 			Message: "Created, not -- processed yet",
 		},
 	}
-
-	result, err := crdclient.Create(bgpasnumber)
+	fmt.Printf("crd create")
+	result, err := clientset.BgpV1().BGPAsNumbers("default").Create(bgpasnumber)
 	if err == nil {
 		fmt.Printf("CREATED: %#v\n", result)
 	} else if apierrors.IsAlreadyExists(err) {
@@ -77,9 +79,10 @@ func main() {
 	} else {
 		panic(err)
 	}
+	fmt.Printf("crd creation done")
 
 	// List all BGP AsNumber objects
-	items, err := crdclient.List(meta_v1.ListOptions{})
+	items, err := clientset.BgpV1().BGPAsNumbers("default").List(meta_v1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -88,48 +91,42 @@ func main() {
 	// BGP Controller
 	// Watch for changes in BGP objects and fire Add, Delete, Update callbacks
 
-	controller := cache.NewSharedIndexInformer(
-		crdclient.NewListWatch(),
-		&crd.BGPAsNumber{},
-		0,
-		cache.Indexers{},
-	)
-	controller.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	informer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			fmt.Printf("add -- crd shared: %s \n", obj)
-			ex := obj.(*crd.BGPAsNumber)
+			ex := obj.(*v1.BGPAsNumber)
 			fmt.Println("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 			newex := ex.DeepCopy()
 			newex.Status.Message = "Processed in handler"
 			newex.Status.State = "Created"
 			fmt.Printf("newex %+v\n", newex)
 			newex.Spec.AsNumber = "555"
-			if _, e := crdclient.Update(newex); e != nil {
+			if _, e := clientset.BgpV1().BGPAsNumbers("default").Update(newex); e != nil {
 				fmt.Println("update satus error", e)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			fmt.Printf("delete: %s shared \n", obj)
-			ex := obj.(*crd.BGPAsNumber)
+			ex := obj.(*v1.BGPAsNumber)
 			fmt.Printf("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 		},
 		UpdateFunc: func(oldObj, newObj interface{}) {
 			fmt.Printf("Update -- old: %s \n      New: %s\n", oldObj, newObj)
-			ex := newObj.(*crd.BGPAsNumber)
+			ex := newObj.(*v1.BGPAsNumber)
 			fmt.Printf("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 			newex := ex.DeepCopy()
 			newex.Status.Message = "Processed in handler"
 			newex.Status.State = "Created"
 			newex.Spec.AsNumber = "555"
 			fmt.Printf("newex %+v\n", newex)
-			if _, e := crdclient.Update(newex); e != nil {
+			if _, e := clientset.BgpV1().BGPAsNumbers("default").Update(newex); e != nil {
 				fmt.Println("update satus error", e)
 			}
 		},
 	},
 	)
 	stop := make(chan struct{})
-	go controller.Run(stop)
+	go bgpInformerFactory.Start(stop)
 
 	// Wait forever
 	select {}
