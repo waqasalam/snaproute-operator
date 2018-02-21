@@ -1,7 +1,0 @@
-apiVersion: "snaproute.com/v1"
-kind: "BGPAsNumber"
-metadata:
-        generateName: bgp-
-spec:
-    asnumber: "100"
-    enable: true

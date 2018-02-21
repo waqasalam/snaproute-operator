@@ -16,29 +16,29 @@ limitations under the License.
 package v1
 
 import (
-	v1 "snaproute-operator/pkg/apis/bgp/v1"
+	v1 "snaproute-operator/pkg/apis/pmd/v1"
 	"snaproute-operator/pkg/client/clientset/versioned/scheme"
 
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )
 
-type BgpV1Interface interface {
+type PmdV1Interface interface {
 	RESTClient() rest.Interface
-	BGPAsNumbersGetter
+	PMDAsNumbersGetter
 }
 
-// BgpV1Client is used to interact with features provided by the bgp.snaproute.com group.
-type BgpV1Client struct {
+// PmdV1Client is used to interact with features provided by the pmd.snaproute.com group.
+type PmdV1Client struct {
 	restClient rest.Interface
 }
 
-func (c *BgpV1Client) BGPAsNumbers(namespace string) BGPAsNumberInterface {
-	return newBGPAsNumbers(c, namespace)
+func (c *PmdV1Client) PMDAsNumbers(namespace string) PMDAsNumberInterface {
+	return newPMDAsNumbers(c, namespace)
 }
 
-// NewForConfig creates a new BgpV1Client for the given config.
-func NewForConfig(c *rest.Config) (*BgpV1Client, error) {
+// NewForConfig creates a new PmdV1Client for the given config.
+func NewForConfig(c *rest.Config) (*PmdV1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -47,12 +47,12 @@ func NewForConfig(c *rest.Config) (*BgpV1Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &BgpV1Client{client}, nil
+	return &PmdV1Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new BgpV1Client for the given config and
+// NewForConfigOrDie creates a new PmdV1Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *BgpV1Client {
+func NewForConfigOrDie(c *rest.Config) *PmdV1Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -60,9 +60,9 @@ func NewForConfigOrDie(c *rest.Config) *BgpV1Client {
 	return client
 }
 
-// New creates a new BgpV1Client for the given RESTClient.
-func New(c rest.Interface) *BgpV1Client {
-	return &BgpV1Client{c}
+// New creates a new PmdV1Client for the given RESTClient.
+func New(c rest.Interface) *PmdV1Client {
+	return &PmdV1Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
@@ -80,7 +80,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *BgpV1Client) RESTClient() rest.Interface {
+func (c *PmdV1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

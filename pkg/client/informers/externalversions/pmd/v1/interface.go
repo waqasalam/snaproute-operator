@@ -24,8 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// BGPAsNumbers returns a BGPAsNumberInformer.
-	BGPAsNumbers() BGPAsNumberInformer
+	// PMDAsNumbers returns a PMDAsNumberInformer.
+	PMDAsNumbers() PMDAsNumberInformer
 }
 
 type version struct {
@@ -39,7 +39,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// BGPAsNumbers returns a BGPAsNumberInformer.
-func (v *version) BGPAsNumbers() BGPAsNumberInformer {
-	return &bGPAsNumberInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// PMDAsNumbers returns a PMDAsNumberInformer.
+func (v *version) PMDAsNumbers() PMDAsNumberInformer {
+	return &pMDAsNumberInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

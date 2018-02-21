@@ -1,7 +1,7 @@
 apiVersion: "snaproute.com/v1"
-kind: "BGPAsNumber"
+kind: "PMDAsNumber"
 metadata:
-        name: bgpexample3
+        name: pmdexample3
 spec:
     asnumber: "100"
     enable: true

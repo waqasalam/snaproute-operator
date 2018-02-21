@@ -21,8 +21,8 @@ package externalversions
 import (
 	reflect "reflect"
 	versioned "snaproute-operator/pkg/client/clientset/versioned"
-	bgp "snaproute-operator/pkg/client/informers/externalversions/bgp"
 	internalinterfaces "snaproute-operator/pkg/client/informers/externalversions/internalinterfaces"
+	pmd "snaproute-operator/pkg/client/informers/externalversions/pmd"
 	sync "sync"
 	time "time"
 
@@ -123,9 +123,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Bgp() bgp.Interface
+	Pmd() pmd.Interface
 }
 
-func (f *sharedInformerFactory) Bgp() bgp.Interface {
-	return bgp.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Pmd() pmd.Interface {
+	return pmd.New(f, f.namespace, f.tweakListOptions)
 }

@@ -15,4 +15,4 @@ limitations under the License.
 */
 package v1
 
-type BGPAsNumberExpansion interface{}
+type PMDAsNumberExpansion interface{}

@@ -16,23 +16,23 @@ limitations under the License.
 package fake
 
 import (
-	v1 "snaproute-operator/pkg/client/clientset/versioned/typed/bgp/v1"
+	v1 "snaproute-operator/pkg/client/clientset/versioned/typed/pmd/v1"
 
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeBgpV1 struct {
+type FakePmdV1 struct {
 	*testing.Fake
 }
 
-func (c *FakeBgpV1) BGPAsNumbers(namespace string) v1.BGPAsNumberInterface {
-	return &FakeBGPAsNumbers{c, namespace}
+func (c *FakePmdV1) PMDAsNumbers(namespace string) v1.PMDAsNumberInterface {
+	return &FakePMDAsNumbers{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeBgpV1) RESTClient() rest.Interface {
+func (c *FakePmdV1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

@@ -19,10 +19,10 @@ limitations under the License.
 package v1
 
 import (
-	bgp_v1 "snaproute-operator/pkg/apis/bgp/v1"
+	pmd_v1 "snaproute-operator/pkg/apis/pmd/v1"
 	versioned "snaproute-operator/pkg/client/clientset/versioned"
 	internalinterfaces "snaproute-operator/pkg/client/informers/externalversions/internalinterfaces"
-	v1 "snaproute-operator/pkg/client/listers/bgp/v1"
+	v1 "snaproute-operator/pkg/client/listers/pmd/v1"
 	time "time"
 
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,59 +31,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// BGPAsNumberInformer provides access to a shared informer and lister for
-// BGPAsNumbers.
-type BGPAsNumberInformer interface {
+// PMDAsNumberInformer provides access to a shared informer and lister for
+// PMDAsNumbers.
+type PMDAsNumberInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1.BGPAsNumberLister
+	Lister() v1.PMDAsNumberLister
 }
 
-type bGPAsNumberInformer struct {
+type pMDAsNumberInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewBGPAsNumberInformer constructs a new informer for BGPAsNumber type.
+// NewPMDAsNumberInformer constructs a new informer for PMDAsNumber type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewBGPAsNumberInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredBGPAsNumberInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewPMDAsNumberInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredPMDAsNumberInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredBGPAsNumberInformer constructs a new informer for BGPAsNumber type.
+// NewFilteredPMDAsNumberInformer constructs a new informer for PMDAsNumber type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredBGPAsNumberInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredPMDAsNumberInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.BgpV1().BGPAsNumbers(namespace).List(options)
+				return client.PmdV1().PMDAsNumbers(namespace).List(options)
 			},
 			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.BgpV1().BGPAsNumbers(namespace).Watch(options)
+				return client.PmdV1().PMDAsNumbers(namespace).Watch(options)
 			},
 		},
-		&bgp_v1.BGPAsNumber{},
+		&pmd_v1.PMDAsNumber{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *bGPAsNumberInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredBGPAsNumberInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *pMDAsNumberInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredPMDAsNumberInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *bGPAsNumberInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&bgp_v1.BGPAsNumber{}, f.defaultInformer)
+func (f *pMDAsNumberInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&pmd_v1.PMDAsNumber{}, f.defaultInformer)
 }
 
-func (f *bGPAsNumberInformer) Lister() v1.BGPAsNumberLister {
-	return v1.NewBGPAsNumberLister(f.Informer().GetIndexer())
+func (f *pMDAsNumberInformer) Lister() v1.PMDAsNumberLister {
+	return v1.NewPMDAsNumberLister(f.Informer().GetIndexer())
 }

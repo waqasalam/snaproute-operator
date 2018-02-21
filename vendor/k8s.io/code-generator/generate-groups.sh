@@ -62,7 +62,7 @@ done
 
 if [ "${GENS}" = "all" ] || grep -qw "deepcopy" <<<"${GENS}"; then
   echo "Generating deepcopy funcs"
-   ~/mino_dev/snaproute/bin/deepcopy-gen --input-dirs $(codegen::join , "${FQ_APIS[@]}") -O zz_generated.deepcopy --bounding-dirs ${APIS_PKG} "$@"
+   ~/newest/bin/deepcopy-gen --input-dirs $(codegen::join , "${FQ_APIS[@]}") -O zz_generated.deepcopy --bounding-dirs ${APIS_PKG} "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "client" <<<"${GENS}"; then

@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
-	"snaproute-operator/pkg/apis/bgp/v1"
+	"snaproute-operator/pkg/apis/pmd/v1"
 	clientset "snaproute-operator/pkg/client/clientset/versioned"
 	scheme "snaproute-operator/pkg/client/clientset/versioned/scheme"
 	informers "snaproute-operator/pkg/client/informers/externalversions"
@@ -52,11 +52,11 @@ func main() {
 	}
 
 	scheme.AddToScheme(scheme.Scheme)
-	bgpInformerFactory := informers.NewSharedInformerFactory(clientset, time.Second*30)
-	informer := bgpInformerFactory.Bgp().V1().BGPAsNumbers()
+	pmdInformerFactory := informers.NewSharedInformerFactory(clientset, time.Second*30)
+	informer := bgpInformerFactory.Pmd().V1().BGPAsNumbers()
 	// Create a new BGPAsNumber object and write to k8s you can use
 	// bgp.yaml
-	bgpasnumber := &v1.BGPAsNumber{
+	pmdasnumber := &v1.BGPAsNumber{
 		ObjectMeta: meta_v1.ObjectMeta{
 			Name:   "bgpasnumber1",
 			Labels: map[string]string{"mylabel": "test"},
@@ -71,7 +71,7 @@ func main() {
 		},
 	}
 	fmt.Printf("crd create")
-	result, err := clientset.BgpV1().BGPAsNumbers("default").Create(bgpasnumber)
+	result, err := clientset.PmdV1().PmdAsNumbers("default").Create(pmdasnumber)
 	if err == nil {
 		fmt.Printf("CREATED: %#v\n", result)
 	} else if apierrors.IsAlreadyExists(err) {
@@ -82,7 +82,7 @@ func main() {
 	fmt.Printf("crd creation done")
 
 	// List all BGP AsNumber objects
-	items, err := clientset.BgpV1().BGPAsNumbers("default").List(meta_v1.ListOptions{})
+	items, err := clientset.PmdV1().BGPAsNumbers("default").List(meta_v1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +101,7 @@ func main() {
 			newex.Status.State = "Created"
 			fmt.Printf("newex %+v\n", newex)
 			newex.Spec.AsNumber = "555"
-			if _, e := clientset.BgpV1().BGPAsNumbers("default").Update(newex); e != nil {
+			if _, e := clientset.PmdV1().BGPAsNumbers("default").Update(newex); e != nil {
 				fmt.Println("update satus error", e)
 			}
 		},
@@ -119,7 +119,7 @@ func main() {
 			newex.Status.State = "Created"
 			newex.Spec.AsNumber = "555"
 			fmt.Printf("newex %+v\n", newex)
-			if _, e := clientset.BgpV1().BGPAsNumbers("default").Update(newex); e != nil {
+			if _, e := clientset.PmdV1().BGPAsNumbers("default").Update(newex); e != nil {
 				fmt.Println("update satus error", e)
 			}
 		},

@@ -16,7 +16,7 @@ limitations under the License.
 package versioned
 
 import (
-	bgpv1 "snaproute-operator/pkg/client/clientset/versioned/typed/bgp/v1"
+	pmdv1 "snaproute-operator/pkg/client/clientset/versioned/typed/pmd/v1"
 
 	glog "github.com/golang/glog"
 	discovery "k8s.io/client-go/discovery"
@@ -26,27 +26,27 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	BgpV1() bgpv1.BgpV1Interface
+	PmdV1() pmdv1.PmdV1Interface
 	// Deprecated: please explicitly pick a version if possible.
-	Bgp() bgpv1.BgpV1Interface
+	Pmd() pmdv1.PmdV1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	bgpV1 *bgpv1.BgpV1Client
+	pmdV1 *pmdv1.PmdV1Client
 }
 
-// BgpV1 retrieves the BgpV1Client
-func (c *Clientset) BgpV1() bgpv1.BgpV1Interface {
-	return c.bgpV1
+// PmdV1 retrieves the PmdV1Client
+func (c *Clientset) PmdV1() pmdv1.PmdV1Interface {
+	return c.pmdV1
 }
 
-// Deprecated: Bgp retrieves the default version of BgpClient.
+// Deprecated: Pmd retrieves the default version of PmdClient.
 // Please explicitly pick a version.
-func (c *Clientset) Bgp() bgpv1.BgpV1Interface {
-	return c.bgpV1
+func (c *Clientset) Pmd() pmdv1.PmdV1Interface {
+	return c.pmdV1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -65,7 +65,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.bgpV1, err = bgpv1.NewForConfig(&configShallowCopy)
+	cs.pmdV1, err = pmdv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.bgpV1 = bgpv1.NewForConfigOrDie(c)
+	cs.pmdV1 = pmdv1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -91,7 +91,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.bgpV1 = bgpv1.New(c)
+	cs.pmdV1 = pmdv1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

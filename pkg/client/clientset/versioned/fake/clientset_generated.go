@@ -17,8 +17,8 @@ package fake
 
 import (
 	clientset "snaproute-operator/pkg/client/clientset/versioned"
-	bgpv1 "snaproute-operator/pkg/client/clientset/versioned/typed/bgp/v1"
-	fakebgpv1 "snaproute-operator/pkg/client/clientset/versioned/typed/bgp/v1/fake"
+	pmdv1 "snaproute-operator/pkg/client/clientset/versioned/typed/pmd/v1"
+	fakepmdv1 "snaproute-operator/pkg/client/clientset/versioned/typed/pmd/v1/fake"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -68,12 +68,12 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 
 var _ clientset.Interface = &Clientset{}
 
-// BgpV1 retrieves the BgpV1Client
-func (c *Clientset) BgpV1() bgpv1.BgpV1Interface {
-	return &fakebgpv1.FakeBgpV1{Fake: &c.Fake}
+// PmdV1 retrieves the PmdV1Client
+func (c *Clientset) PmdV1() pmdv1.PmdV1Interface {
+	return &fakepmdv1.FakePmdV1{Fake: &c.Fake}
 }
 
-// Bgp retrieves the BgpV1Client
-func (c *Clientset) Bgp() bgpv1.BgpV1Interface {
-	return &fakebgpv1.FakeBgpV1{Fake: &c.Fake}
+// Pmd retrieves the PmdV1Client
+func (c *Clientset) Pmd() pmdv1.PmdV1Interface {
+	return &fakepmdv1.FakePmdV1{Fake: &c.Fake}
 }

@@ -16,7 +16,7 @@ limitations under the License.
 package fake
 
 import (
-	bgp_v1 "snaproute-operator/pkg/apis/bgp/v1"
+	pmd_v1 "snaproute-operator/pkg/apis/pmd/v1"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -28,29 +28,29 @@ import (
 
 // FakeBGPAsNumbers implements BGPAsNumberInterface
 type FakeBGPAsNumbers struct {
-	Fake *FakeBgpV1
+	Fake *FakePmdV1
 	ns   string
 }
 
-var bgpasnumbersResource = schema.GroupVersionResource{Group: "bgp.snaproute.com", Version: "v1", Resource: "bgpasnumbers"}
+var bgpasnumbersResource = schema.GroupVersionResource{Group: "pmd", Version: "v1", Resource: "bgpasnumbers"}
 
-var bgpasnumbersKind = schema.GroupVersionKind{Group: "bgp.snaproute.com", Version: "v1", Kind: "BGPAsNumber"}
+var bgpasnumbersKind = schema.GroupVersionKind{Group: "pmd", Version: "v1", Kind: "BGPAsNumber"}
 
 // Get takes name of the bGPAsNumber, and returns the corresponding bGPAsNumber object, and an error if there is any.
-func (c *FakeBGPAsNumbers) Get(name string, options v1.GetOptions) (result *bgp_v1.BGPAsNumber, err error) {
+func (c *FakeBGPAsNumbers) Get(name string, options v1.GetOptions) (result *pmd_v1.BGPAsNumber, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(bgpasnumbersResource, c.ns, name), &bgp_v1.BGPAsNumber{})
+		Invokes(testing.NewGetAction(bgpasnumbersResource, c.ns, name), &pmd_v1.BGPAsNumber{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*bgp_v1.BGPAsNumber), err
+	return obj.(*pmd_v1.BGPAsNumber), err
 }
 
 // List takes label and field selectors, and returns the list of BGPAsNumbers that match those selectors.
-func (c *FakeBGPAsNumbers) List(opts v1.ListOptions) (result *bgp_v1.BGPAsNumberList, err error) {
+func (c *FakeBGPAsNumbers) List(opts v1.ListOptions) (result *pmd_v1.BGPAsNumberList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(bgpasnumbersResource, bgpasnumbersKind, c.ns, opts), &bgp_v1.BGPAsNumberList{})
+		Invokes(testing.NewListAction(bgpasnumbersResource, bgpasnumbersKind, c.ns, opts), &pmd_v1.BGPAsNumberList{})
 
 	if obj == nil {
 		return nil, err
@@ -60,8 +60,8 @@ func (c *FakeBGPAsNumbers) List(opts v1.ListOptions) (result *bgp_v1.BGPAsNumber
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &bgp_v1.BGPAsNumberList{}
-	for _, item := range obj.(*bgp_v1.BGPAsNumberList).Items {
+	list := &pmd_v1.BGPAsNumberList{}
+	for _, item := range obj.(*pmd_v1.BGPAsNumberList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -77,31 +77,31 @@ func (c *FakeBGPAsNumbers) Watch(opts v1.ListOptions) (watch.Interface, error) {
 }
 
 // Create takes the representation of a bGPAsNumber and creates it.  Returns the server's representation of the bGPAsNumber, and an error, if there is any.
-func (c *FakeBGPAsNumbers) Create(bGPAsNumber *bgp_v1.BGPAsNumber) (result *bgp_v1.BGPAsNumber, err error) {
+func (c *FakeBGPAsNumbers) Create(bGPAsNumber *pmd_v1.BGPAsNumber) (result *pmd_v1.BGPAsNumber, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(bgpasnumbersResource, c.ns, bGPAsNumber), &bgp_v1.BGPAsNumber{})
+		Invokes(testing.NewCreateAction(bgpasnumbersResource, c.ns, bGPAsNumber), &pmd_v1.BGPAsNumber{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*bgp_v1.BGPAsNumber), err
+	return obj.(*pmd_v1.BGPAsNumber), err
 }
 
 // Update takes the representation of a bGPAsNumber and updates it. Returns the server's representation of the bGPAsNumber, and an error, if there is any.
-func (c *FakeBGPAsNumbers) Update(bGPAsNumber *bgp_v1.BGPAsNumber) (result *bgp_v1.BGPAsNumber, err error) {
+func (c *FakeBGPAsNumbers) Update(bGPAsNumber *pmd_v1.BGPAsNumber) (result *pmd_v1.BGPAsNumber, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(bgpasnumbersResource, c.ns, bGPAsNumber), &bgp_v1.BGPAsNumber{})
+		Invokes(testing.NewUpdateAction(bgpasnumbersResource, c.ns, bGPAsNumber), &pmd_v1.BGPAsNumber{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*bgp_v1.BGPAsNumber), err
+	return obj.(*pmd_v1.BGPAsNumber), err
 }
 
 // Delete takes name of the bGPAsNumber and deletes it. Returns an error if one occurs.
 func (c *FakeBGPAsNumbers) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(bgpasnumbersResource, c.ns, name), &bgp_v1.BGPAsNumber{})
+		Invokes(testing.NewDeleteAction(bgpasnumbersResource, c.ns, name), &pmd_v1.BGPAsNumber{})
 
 	return err
 }
@@ -110,17 +110,17 @@ func (c *FakeBGPAsNumbers) Delete(name string, options *v1.DeleteOptions) error 
 func (c *FakeBGPAsNumbers) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(bgpasnumbersResource, c.ns, listOptions)
 
-	_, err := c.Fake.Invokes(action, &bgp_v1.BGPAsNumberList{})
+	_, err := c.Fake.Invokes(action, &pmd_v1.BGPAsNumberList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched bGPAsNumber.
-func (c *FakeBGPAsNumbers) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *bgp_v1.BGPAsNumber, err error) {
+func (c *FakeBGPAsNumbers) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *pmd_v1.BGPAsNumber, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(bgpasnumbersResource, c.ns, name, data, subresources...), &bgp_v1.BGPAsNumber{})
+		Invokes(testing.NewPatchSubresourceAction(bgpasnumbersResource, c.ns, name, data, subresources...), &pmd_v1.BGPAsNumber{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*bgp_v1.BGPAsNumber), err
+	return obj.(*pmd_v1.BGPAsNumber), err
 }

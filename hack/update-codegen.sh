@@ -26,5 +26,5 @@ set -o pipefail
 SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..
   ${SCRIPT_ROOT}/vendor/k8s.io/code-generator/generate-groups.sh all \
   snaproute-operator/pkg/client snaproute-operator/pkg/apis \
-  "bgp:v1" \
+  "pmd:v1" \
   --go-header-file ${SCRIPT_ROOT}/hack/custom-boilerplate.go.txt

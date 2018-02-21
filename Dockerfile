@@ -1,3 +1,3 @@
 FROM debian
-COPY ./bgp-crd /bgp-crd
-ENTRYPOINT /bgp-crd
+COPY ./pmd-crd /pmd-crd
+ENTRYPOINT /pmd-crd

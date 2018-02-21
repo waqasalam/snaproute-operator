@@ -16,7 +16,7 @@ limitations under the License.
 package fake
 
 import (
-	bgpv1 "snaproute-operator/pkg/apis/bgp/v1"
+	pmdv1 "snaproute-operator/pkg/apis/pmd/v1"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -48,5 +48,5 @@ func init() {
 // After this, RawExtensions in Kubernetes types will serialize kube-aggregator types
 // correctly.
 func AddToScheme(scheme *runtime.Scheme) {
-	bgpv1.AddToScheme(scheme)
+	pmdv1.AddToScheme(scheme)
 }
