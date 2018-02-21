@@ -2,7 +2,7 @@
 
 
 build: 
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bgp-crd controller/bgp-controller.go
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o pmd-crd controller/pmd-controller.go
 
 container: build
-	docker build -t bgp-crd:latest .
+	docker build -t pmd-crd:latest .
