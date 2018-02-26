@@ -26,6 +26,7 @@ import (
 type PmdV1Interface interface {
 	RESTClient() rest.Interface
 	PMDAsNumbersGetter
+	PMDRoutesGetter
 }
 
 // PmdV1Client is used to interact with features provided by the pmd.snaproute.com group.
@@ -35,6 +36,10 @@ type PmdV1Client struct {
 
 func (c *PmdV1Client) PMDAsNumbers(namespace string) PMDAsNumberInterface {
 	return newPMDAsNumbers(c, namespace)
+}
+
+func (c *PmdV1Client) PMDRoutes(namespace string) PMDRouteInterface {
+	return newPMDRoutes(c, namespace)
 }
 
 // NewForConfig creates a new PmdV1Client for the given config.

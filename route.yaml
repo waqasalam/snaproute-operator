@@ -1,0 +1,8 @@
+apiVersion: "snaproute.com/v1"
+kind: "PMDRoute"
+metadata:
+        name: pmdrouteex
+spec:
+    prefix: "1.1.1.2"
+    length: 24
+    counter: 4

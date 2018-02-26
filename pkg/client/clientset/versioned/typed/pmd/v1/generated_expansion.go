@@ -16,3 +16,5 @@ limitations under the License.
 package v1
 
 type PMDAsNumberExpansion interface{}
+
+type PMDRouteExpansion interface{}

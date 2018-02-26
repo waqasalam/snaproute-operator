@@ -25,3 +25,11 @@ type PMDAsNumberListerExpansion interface{}
 // PMDAsNumberNamespaceListerExpansion allows custom methods to be added to
 // PMDAsNumberNamespaceLister.
 type PMDAsNumberNamespaceListerExpansion interface{}
+
+// PMDRouteListerExpansion allows custom methods to be added to
+// PMDRouteLister.
+type PMDRouteListerExpansion interface{}
+
+// PMDRouteNamespaceListerExpansion allows custom methods to be added to
+// PMDRouteNamespaceLister.
+type PMDRouteNamespaceListerExpansion interface{}

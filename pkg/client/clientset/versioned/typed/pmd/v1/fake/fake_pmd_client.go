@@ -30,6 +30,10 @@ func (c *FakePmdV1) PMDAsNumbers(namespace string) v1.PMDAsNumberInterface {
 	return &FakePMDAsNumbers{c, namespace}
 }
 
+func (c *FakePmdV1) PMDRoutes(namespace string) v1.PMDRouteInterface {
+	return &FakePMDRoutes{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakePmdV1) RESTClient() rest.Interface {

@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// PMDAsNumbers returns a PMDAsNumberInformer.
 	PMDAsNumbers() PMDAsNumberInformer
+	// PMDRoutes returns a PMDRouteInformer.
+	PMDRoutes() PMDRouteInformer
 }
 
 type version struct {
@@ -42,4 +44,9 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // PMDAsNumbers returns a PMDAsNumberInformer.
 func (v *version) PMDAsNumbers() PMDAsNumberInformer {
 	return &pMDAsNumberInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// PMDRoutes returns a PMDRouteInformer.
+func (v *version) PMDRoutes() PMDRouteInformer {
+	return &pMDRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

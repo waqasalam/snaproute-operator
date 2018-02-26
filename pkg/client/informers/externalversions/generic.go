@@ -55,6 +55,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=pmd.snaproute.com, Version=v1
 	case v1.SchemeGroupVersion.WithResource("pmdasnumbers"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Pmd().V1().PMDAsNumbers().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("pmdroutes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Pmd().V1().PMDRoutes().Informer()}, nil
 
 	}
 

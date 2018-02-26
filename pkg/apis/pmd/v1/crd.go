@@ -16,24 +16,31 @@ import (
 )
 
 const (
-	CRDPlural   string = "pmdasnumbers"
-	CRDGroup    string = "snaproute.com"
-	CRDVersion  string = "v1"
-	FullCRDName string = CRDPlural + "." + CRDGroup
+	CRDGroup   string = "snaproute.com"
+	CRDVersion string = "v1"
 )
 
+var Crds = map[string]struct {
+	CrdFullName string
+	CrdPlural   string
+	CrdKind     string
+}{
+	"pmdasnumber": {"pmdasnumbers" + "." + CRDGroup, "pmdasnumbers", reflect.TypeOf(PMDAsNumber{}).Name()},
+	"pmdroute":    {"pmdroutes" + "." + CRDGroup, "pmdroutes", reflect.TypeOf(PMDRoute{}).Name()},
+}
+
 // Create the CRD resource, ignore error if it already exists
-func CreateCRD(clientset apiextcs.Interface) error {
-	fmt.Println("I'm creating the PMD")
+func CreateCRD(clientset apiextcs.Interface, crdname string) error {
+	fmt.Println("I'm creating the PMD", Crds[crdname])
 	crd := &apiextv1beta1.CustomResourceDefinition{
-		ObjectMeta: meta_v1.ObjectMeta{Name: FullCRDName},
+		ObjectMeta: meta_v1.ObjectMeta{Name: Crds[crdname].CrdFullName},
 		Spec: apiextv1beta1.CustomResourceDefinitionSpec{
 			Group:   CRDGroup,
 			Version: CRDVersion,
 			Scope:   apiextv1beta1.NamespaceScoped,
 			Names: apiextv1beta1.CustomResourceDefinitionNames{
-				Plural: CRDPlural,
-				Kind:   reflect.TypeOf(PMDAsNumber{}).Name(),
+				Plural: Crds[crdname].CrdPlural,
+				Kind:   Crds[crdname].CrdKind,
 			},
 		},
 	}
@@ -46,7 +53,7 @@ func CreateCRD(clientset apiextcs.Interface) error {
 
 	// Wait for the CRD to be created before we use it
 	err = wait.Poll(500*time.Millisecond, 60*time.Second, func() (bool, error) {
-		crd, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(FullCRDName, meta_v1.GetOptions{})
+		crd, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(Crds[crdname].CrdFullName, meta_v1.GetOptions{})
 		if err != nil {
 			fmt.Println("panic in wait")
 			panic(err.Error())
@@ -101,4 +108,35 @@ type PMDAsNumberList struct {
 	meta_v1.TypeMeta `json:",inline"`
 	meta_v1.ListMeta `json:"metadata"`
 	Items            []PMDAsNumber `json:"items"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
+// +genclient:noStatus
+
+// Definition of our CRD BGPRoute class
+type PMDRoute struct {
+	meta_v1.TypeMeta   `json:",inline"`
+	meta_v1.ObjectMeta `json:"metadata"`
+	Spec               PMDRouteSpec   `json:"spec"`
+	Status             PMDRouteStatus `json:"status,omitempty"`
+}
+type PMDRouteSpec struct {
+	Prefix  string `json:"prefix"`
+	Length  uint32 `json:"length"`
+	Counter uint32 `json:"counter"`
+}
+
+type PMDRouteStatus struct {
+	State   string `json:"state,omitempty"`
+	Message string `json:"message,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// k8s List Type
+type PMDRouteList struct {
+	meta_v1.TypeMeta `json:",inline"`
+	meta_v1.ListMeta `json:"metadata"`
+	Items            []PMDRoute `json:"items"`
 }

@@ -3,7 +3,7 @@
 ## Build/Installtion
 ```
   make container 
-  kubectl run bgp --image=bgp-crd:latest --image-pull-policy=Never
+  kubectl run pmd --image=pmd-crd:latest --image-pull-policy=Never
 ```
 ```
  kubectl create -f bgp.yaml

@@ -34,28 +34,35 @@ func main() {
 		panic(err.Error())
 	}
 
-	// create clientset and create our CRD, this only need to run once
+	// create clientset
 	clientset, err := clientset.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// create clientset and create our CRD, this only need to run once
 	clt, err := apiextcs.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
-	// note: if the CRD exist our CreateCRD function is set to exit without an error
-	err = v1.CreateCRD(clt)
+
+	//Create all the crds
+	err = v1.CreateCRD(clt, "pmdasnumber")
+	if err != nil {
+		panic(err)
+	}
+
+	err = v1.CreateCRD(clt, "pmdroute")
 	if err != nil {
 		panic(err)
 	}
 
 	scheme.AddToScheme(scheme.Scheme)
+
 	pmdInformerFactory := informers.NewSharedInformerFactory(clientset, time.Second*30)
-	informer := pmdInformerFactory.Pmd().V1().PMDAsNumbers()
-	// Create a new BGPAsNumber object and write to k8s you can use
-	// bgp.yaml
+	fmt.Println("create informers")
+	asinformer := pmdInformerFactory.Pmd().V1().PMDAsNumbers()
+	routeinformer := pmdInformerFactory.Pmd().V1().PMDRoutes()
+
 	pmdasnumber := &v1.PMDAsNumber{
 		ObjectMeta: meta_v1.ObjectMeta{
 			Name:   "pmdasnumber1",
@@ -70,12 +77,12 @@ func main() {
 			Message: "Created, not -- processed yet",
 		},
 	}
-	fmt.Printf("crd create")
+
 	result, err := clientset.PmdV1().PMDAsNumbers("default").Create(pmdasnumber)
 	if err == nil {
-		fmt.Printf("CREATED: %#v\n", result)
+		fmt.Printf("created: %#v\n", result)
 	} else if apierrors.IsAlreadyExists(err) {
-		fmt.Printf("ALREADY-- EXISTS: %#v\n", result)
+		fmt.Printf("already created: %#v\n", result)
 	} else {
 		panic(err)
 	}
@@ -91,15 +98,13 @@ func main() {
 	// BGP Controller
 	// Watch for changes in BGP objects and fire Add, Delete, Update callbacks
 
-	informer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	asinformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			fmt.Printf("add -- crd shared: %s \n", obj)
 			ex := obj.(*v1.PMDAsNumber)
-			fmt.Println("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 			newex := ex.DeepCopy()
 			newex.Status.Message = "Processed in handler"
 			newex.Status.State = "Created"
-			fmt.Printf("newex %+v\n", newex)
 			newex.Spec.AsNumber = "555"
 			if _, e := clientset.PmdV1().PMDAsNumbers("default").Update(newex); e != nil {
 				fmt.Println("update satus error", e)
@@ -107,21 +112,31 @@ func main() {
 		},
 		DeleteFunc: func(obj interface{}) {
 			fmt.Printf("delete: %s shared \n", obj)
-			ex := obj.(*v1.PMDAsNumber)
-			fmt.Printf("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 		},
 		UpdateFunc: func(oldObj, newObj interface{}) {
 			fmt.Printf("Update -- old: %s \n      New: %s\n", oldObj, newObj)
 			ex := newObj.(*v1.PMDAsNumber)
-			fmt.Printf("AsNumber", ex.Spec.AsNumber, "Enable", ex.Spec.Enable)
 			newex := ex.DeepCopy()
 			newex.Status.Message = "Processed in handler"
 			newex.Status.State = "Created"
 			newex.Spec.AsNumber = "555"
-			fmt.Printf("newex %+v\n", newex)
 			if _, e := clientset.PmdV1().PMDAsNumbers("default").Update(newex); e != nil {
 				fmt.Println("update satus error", e)
 			}
+		},
+	},
+	)
+
+	routeinformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			fmt.Printf("add -- route: %s \n", obj)
+		},
+		DeleteFunc: func(obj interface{}) {
+			fmt.Printf("delete route: %s shared \n", obj)
+
+		},
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			fmt.Printf("Update route: %s \n      New: %s\n", oldObj, newObj)
 		},
 	},
 	)
